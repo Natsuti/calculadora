@@ -1,31 +1,16 @@
 todo = input("calcula: ")
-num1 = ""
-operador = ""
-num2 = ""
+tokens = []
 resultado = 0
 buffer = ""
 for i in range(len(todo)):
-    print(f"todo[i]: {todo[i]}")
-    if todo[i] != " ":
+    if todo[i] >= "0" and todo[i] <= "9":
         buffer += todo[i]
-        print(f"buffer: {buffer}")
-    elif todo[i] == " " and num1 == "":
-        num1 = buffer
-        print(f"num1: {num1}, buffer: {buffer}")
+        print(f"1. buffer: {buffer}")
+    elif todo[i] in "+-*/":
+        if buffer:
+            tokens.append(buffer)
+        tokens.append(todo[i])
+        print(f"2. buffer: {buffer}, tokens: {tokens}")
         buffer = ""
-    elif todo[i] == " " and operador == "":
-        operador = buffer
-        print(f"operador: {operador}, buffer: {buffer}")
-        buffer = ""
-num2 = buffer
-print(f"buffer: {buffer}, num1: {num1}, operador: {operador}, num2: {num2}")
-buffer = ""
-if operador == "+":
-    resultado = int(num1) + int(num2)
-if operador == "-":
-    resultado = int(num1) - int(num2)
-if operador == "*":
-    resultado = int(num1) * int(num2)
-if operador == "/":
-    resultado = int(num1) / int(num2)
-print(resultado)
+tokens.append(buffer)
+print(f"3. buffer: {buffer}, tokens: {tokens}")
