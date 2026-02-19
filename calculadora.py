@@ -1,44 +1,56 @@
-todo = input("calcula: ")
-tokens = []
-resultado = None
-buffer = ""
-# Se separa todo, la verdad es bien dificil separar los procesos, en esta caso primero la parte de la tokenizacion(lexer).
-for i in range(len(todo)):
-    if todo[i] >= "0" and todo[i] <= "9":
-        buffer += todo[i]
-        print(f"1. buffer: {buffer}")
-    elif todo[i] in "+-*/":
-        if buffer:
-            tokens.append(buffer)
-        tokens.append(todo[i])
-        print(f"2. buffer: {buffer}, tokens: {tokens}")
-        buffer = ""
-tokens.append(buffer)
-print(f"3. buffer: {buffer}, tokens: {tokens}")
+def pedir():
+    return input("calcula: ")
 
-# Si un algoritmo dependede de indices estables, la estructura no puede mutar, la estructura no puede mutar.
-# Si la estructura muta, el indice debe estar bajo control explicito
-# Ahora toca el parser(transforma los tokens en algo o eso creo, no importa la verdad, solo se que hace en codigo)
-# Esto es un problema
-for i in range(len(tokens)):
-    if resultado:
-        if tokens[i] in "+-*/":
-            if tokens[i] == "+":
-                resultado += int(tokens[i + 1])
-            elif tokens[i] == "-":
-                resultado -= int(tokens[i + 1])
-            elif tokens[i] == "*":
-                resultado *= int(tokens[i + 1])
-            elif tokens[i] == "/":
-                resultado /= int(tokens[i + 1])
-    else:
-        if tokens[i] in "+-*/":
-            if tokens[i] == "+":
-                resultado = int(tokens[i - 1]) + int(tokens[i + 1])
-            elif tokens[i] == "-":
-                resultado = int(tokens[i - 1]) - int(tokens[i + 1])
-            elif tokens[i] == "*":
-                resultado = int(tokens[i - 1]) * int(tokens[i + 1])
-            elif tokens[i] == "/":
-                resultado = int(tokens[i - 1]) / int(tokens[i + 1])
-print(resultado)
+
+def tokenizar(s):
+    buffer = ""
+    tokens = []
+    for i in s:
+        if i >= "0" and i <= "9":
+            buffer += i
+        elif i in "+-*/":
+            if buffer:
+                tokens.append(("num", int(buffer)))
+                buffer = ""
+            tokens.append(("op", i))
+    if buffer:
+        tokens.append(("num", int(buffer)))
+    return tokens
+
+
+def parsear(li):
+    pas = 0
+
+    def expr(tokens):
+        nonlocal pas
+        left = term(tokens)
+        while pas < len(tokens) and tokens[pas][0] == "op" and tokens[pas][1] in "+-":
+            op = tokens[pas][1]
+            pas += 1
+            right = term(tokens)
+            left = {"BinOp": {"left": left, "op": op, "right": right}}
+        return left
+
+    def term(tokens):
+        nonlocal pas
+        left = factor(tokens)
+        while pas < len(tokens) and tokens[pas][0] == "op" and tokens[pas][1] in "*/":
+            op = tokens[pas][1]
+            pas += 1
+            right = factor(tokens)
+            left = {"BinOp": {"left": left, "op": op, "right": right}}
+        return left
+
+    def factor(tokens):
+        nonlocal pas
+        token = tokens[pas]
+        pas += 1
+        return {"Number": token[1]}
+
+    return {"body": expr(li)}
+
+
+import json
+
+ast = parsear(tokenizar("2+3*4"))
+print(json.dumps(ast, indent=4))
