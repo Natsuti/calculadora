@@ -62,7 +62,6 @@ calcula: 2+3\*4 o lo que sea, no pongan cosas que no sean números o se crashear
 
 Próximos pasos
 
-- Paréntesis completos
 - Operadores unarios
 - Potencias
 - Funciones matemáticas
